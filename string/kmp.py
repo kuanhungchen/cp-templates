@@ -4,9 +4,9 @@ def kmp(s, p):
         pref_func = [0 for _ in range(n)]
         for i in range(1, n):
             j = pref_func[i - 1]
-            while j and s[i] != s[j]:
+            while j and p[i] != p[j]:
                 j = pref_func[j - 1]
-            pref_func[i] = j = j + (s[i] == s[j])
+            pref_func[i] = j = j + (p[i] == p[j])
         return pref_func
 
     pref_func = get_pref_func(p)
