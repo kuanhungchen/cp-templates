@@ -6,9 +6,10 @@ class Fenwick:
         if nums is not None: self.__build(nums)
 
     def add(self, idx, dlt):
-        while idx < self.n:
+        idx += 1
+        while idx <= self.n:
             self.arr[idx] += dlt
-            idx |= idx + 1
+            idx += idx & -idx
 
     def query(self, ql, qr):
         # [ql, qr)
@@ -18,8 +19,8 @@ class Fenwick:
         # [0, qr)
         ans = 0
         while qr:
-            ans += self.arr[qr - 1]
-            qr &= qr - 1
+            ans += self.arr[qr]
+            qr -= qr & -qr
         return ans
 
     def suff(self, ql):
@@ -28,15 +29,17 @@ class Fenwick:
 
     def bisect_left(self, val):
         # first idx s.t. sum[0, idx) >= val
-        idx = -1
-        for k in range(self.LOGN - 1, -1, -1):
-            right_idx = idx + (1 << k)
-            if right_idx < self.n and self.arr[right_idx] <= val:
-                idx = right_idx; val -= self.arr[idx]
-        return idx + 1
+        if val <= 0: return 0
+        idx = 0
+        for k in range(self.LOGN, -1, -1):
+            shift = 1 << k
+            if idx + shift <= self.n and self.arr[idx + shift] <= val:
+                val -= self.arr[idx + shift]
+                idx += shift
+        return idx
 
     def __build(self, nums):
-        self.arr = nums.copy()
-        for i in range(self.n):
-            j = i | (i + 1)
-            if j < self.n: self.arr[j] += self.arr[i]
+        self.arr = [0] + nums.copy()
+        for i in range(1, self.n):
+            if i + (i & -i) <= self.n:
+                self.arr[i + (i & -i)] += self.arr[i]
