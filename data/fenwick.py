@@ -29,11 +29,10 @@ class Fenwick:
 
     def bisect_left(self, val):
         # first idx s.t. sum[0, idx) >= val
-        if val <= 0: return 0
         idx = 0
         for k in range(self.LOGN, -1, -1):
             shift = 1 << k
-            if idx + shift <= self.n and self.arr[idx + shift] <= val:
+            if idx + shift <= self.n and self.arr[idx + shift] < val:
                 val -= self.arr[idx + shift]
                 idx += shift
         return idx
