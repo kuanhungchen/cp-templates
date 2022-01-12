@@ -1,6 +1,5 @@
-def prim(mat):
+def prim(n, mat):
     # O(V^2)
-    n = len(mat)
     used = [False for _ in range(n)]
     dist = [INF for _ in range(N)]
     dist[0] = 0
@@ -17,18 +16,17 @@ def prim(mat):
                 dist[i] = min(dist[i], mat[min_i][i])
     return ans if cnt == n else -1
 
-def prim(G):
+def prim(n, G):
     # O(ElogV)
-    n = len(G)
     used = [False for _ in range(n)]
     pq = [(0, 0)]  # (weight, node)
     ans = cnt = 0
     while pq:
-        w, node = heapq.heappop(pq)
+        w, node = heappop(pq)
         if used[node]:
             continue
         used[node] = True
         ans += w; cnt += 1
         for (neigh, neigh_w) in G[node]:
-            heapq.heappush(pq, (neigh, neigh_w))
+            heappush(pq, (neigh, neigh_w))
     return ans if cnt == n else -1

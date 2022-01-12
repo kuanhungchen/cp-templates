@@ -1,4 +1,4 @@
-def diameter(G):
+def diameter(n, G):
     def bfs(start):
         dist = [-1 for _ in range(n)]
         dist[start] = 0
@@ -13,7 +13,6 @@ def diameter(G):
         max_i = dist.index(max(dist))
         return max_i, dist
 
-    n = len(G)
     u, _ = bfs(0)
     v, dist = bfs(u)
     diam = dist[v]

@@ -1,6 +1,5 @@
 class LCA:
-    def __init__(self, G, root):
-        n = len(G)
+    def __init__(self, n, G, root):
         self.G = G
         self.first = [-1 for _ in range(n)]
         self.depth = [-1 for _ in range(n)]
