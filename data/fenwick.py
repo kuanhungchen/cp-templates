@@ -28,11 +28,21 @@ class Fenwick:
         return self.pref(self.n) - self.pref(ql)
 
     def bisect_left(self, val):
-        # first idx s.t. sum[0, idx) >= val
+        # equivalent to bisect_left on prefix sums array
         idx = 0
         for k in range(self.LOGN, -1, -1):
             shift = 1 << k
             if idx + shift <= self.n and self.arr[idx + shift] < val:
+                val -= self.arr[idx + shift]
+                idx += shift
+        return idx
+
+    def bisect_right(self, val):
+        # equivalent to bisect_right on prefix sums array
+        idx = 0
+        for k in range(self.LOGN, -1, -1):
+            shift = 1 << k
+            if idx + shift <= self.n and self.arr[idx + shift] <= val:
                 val -= self.arr[idx + shift]
                 idx += shift
         return idx
