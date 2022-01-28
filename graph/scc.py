@@ -1,6 +1,7 @@
 def tarjan(n, G):
-    SCC, S, P = list(), list(), list()
-    stk, state = [i for i in range(n)], [0 for _ in range(n)]
+    SCC, S, P = [], [], []
+    stk = list(range(n))
+    state = [0 for _ in range(n)]
     while stk:
         node = stk.pop()
         if node < 0:
@@ -36,7 +37,7 @@ def kosaraju(n, G, revG):
             if not seen[neigh]:
                 dfs2(neigh)
 
-    SCC, S, order = list(), list(), list()
+    SCC, S, order = [], [], []
     seen = [False for _ in range(n)]
     for i in range(n):
         if not seen[i]:
@@ -47,5 +48,5 @@ def kosaraju(n, G, revG):
         if not seen[node]:
             dfs2(node)
             SCC.append(S)
-            S = list()
+            S = []
     return SCC

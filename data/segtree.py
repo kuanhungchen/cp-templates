@@ -30,6 +30,7 @@ class SegTree:
         self.ptassign(idx, self.getval(idx) + dlt)
 
     def query(self, ql, qr):
+        # [ql, qr)
         ql += self.n2
         qr += self.n2
         ans = self.DFLT
