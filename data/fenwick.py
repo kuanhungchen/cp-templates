@@ -2,7 +2,7 @@ class Fenwick:
     def __init__(self, n, nums=None):
         self.n = n
         self.LOGN = self.n.bit_length()
-        self.arr = []
+        self.arr = [0 for _ in range(n + 1)]
         if nums is not None: self.__build(nums)
 
     def add(self, idx, dlt):
@@ -48,7 +48,7 @@ class Fenwick:
         return idx
 
     def __build(self, nums):
-        self.arr = [0] + nums.copy()
+        self.arr[1:] = nums.copy()
         for i in range(1, self.n):
             if i + (i & -i) <= self.n:
                 self.arr[i + (i & -i)] += self.arr[i]
