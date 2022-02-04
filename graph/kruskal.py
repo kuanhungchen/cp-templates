@@ -1,6 +1,6 @@
 def kruskal(n, edges):
     # O(ElogE)
-    edges = sorted(edges, key=lambda x: x[2])
+    edges.sort(key=lambda e: e[2])
     dsu = DSU(n)
     res = 0
     for (u, v, c) in edges:
