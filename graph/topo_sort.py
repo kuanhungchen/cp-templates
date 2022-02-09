@@ -16,4 +16,4 @@ def topo_sort(n, G):
                 q.append(v)
         cnt += 1
 
-    return order if cnt == n else list()
+    return order if cnt == n else []
