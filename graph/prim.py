@@ -1,7 +1,7 @@
-def prim(n, mat):
+def prim_dense(n, mat):
     # O(V^2)
     used = [False for _ in range(n)]
-    dist = [INF for _ in range(N)]
+    dist = [INF for _ in range(n)]
     dist[0] = 0
     ans = cnt = 0
     for _ in range(n):
@@ -28,5 +28,6 @@ def prim(n, G):
         used[node] = True
         ans += w; cnt += 1
         for (neigh, neigh_w) in G[node]:
-            heappush(pq, (neigh, neigh_w))
+            if not used[neigh]:
+                heappush(pq, (neigh_w, neigh))
     return ans if cnt == n else -1
