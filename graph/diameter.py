@@ -24,3 +24,17 @@ def diameter(n, G):
                 v = neigh
                 break
     return diam, path
+
+def diameter2(n, G):
+    def dfs(node, pre):
+        nonlocal diam
+        for (neigh, neigh_d) in G[node]:
+            if neigh == pre: continue
+            dfs(neigh, node)
+            diam = max(diam, d[node] + d[neigh] + neigh_d)
+            d[node] = max(d[node], d[neigh] + neigh_d)
+
+    diam = 0
+    d = [0 for _ in range(n)]
+    dfs(0, -1)
+    return diam
