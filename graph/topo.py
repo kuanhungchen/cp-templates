@@ -1,4 +1,4 @@
-def topo_sort(n, G):
+def topo(n, G):
     order = []
     in_deg = [0 for _ in range(n)]
     for vs in G:
@@ -15,5 +15,4 @@ def topo_sort(n, G):
             if in_deg[v] == 0:
                 q.append(v)
         cnt += 1
-
     return order if cnt == n else []
