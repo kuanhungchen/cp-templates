@@ -1,22 +1,22 @@
 def kmp(s, p):
-    def get_pref_func(p):
-        n = len(p)
-        pref_func = [0 for _ in range(n)]
-        for i in range(1, n):
-            j = pref_func[i - 1]
-            while j and p[i] != p[j]:
-                j = pref_func[j - 1]
-            pref_func[i] = j = j + (p[i] == p[j])
-        return pref_func
+    n, m = len(s), len(p)
+    pref_func = [0 for _ in range(m)]
+    j = 0
+    for i in range(1, m):
+        while p[i] != p[j] and j:
+            j = pref_func[j - 1]
+        if p[i] == p[j]:
+            j += 1
+            pref_func[i] = j
 
-    pref_func = get_pref_func(p)
     j = 0
     ans = []
-    for i, c in enumerate(s):
-        while j and p[j] != c:
+    for i in range(n):
+        while s[i] != p[j] and j:
             j = pref_func[j - 1]
-        j += (p[j] == c)
-        if j == len(p):
-            ans.append(i - j + 1)
-            j = pref_func[j - 1]
+        if s[i] == p[j]:
+            j += 1
+            if j == m:
+                ans.append(i - j + 1)
+                j = pref_func[j - 1]
     return ans
