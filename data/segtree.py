@@ -3,13 +3,11 @@ class SegTree:
         self.FUNC = min
         self.DFLT = 1 << 60
 
-        self.n = n
-        self.k = (n - 1).bit_length()
-        self.n2 = 1 << self.k
-        self.arr = arr = [self.DFLT for _ in range(1 << (self.k + 1))]
+        k = (n - 1).bit_length()
+        self.n2 = 1 << k
+        self.arr = arr = [self.DFLT for _ in range(1 << (k + 1))]
         if nums:
-            for i in range(self.n):
-                arr[self.n2 + i] = nums[i]
+            arr[self.n2:self.n2 + n] = nums
             self.__build()
 
     def __build(self):
