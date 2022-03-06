@@ -1,5 +1,5 @@
 def divisors(x):
-    # return all divisors of x
+    # return all divisors of x, O(sqrt(x))
     divs1, divs2 = [], []
     k = 1
     while k * k <= x:
