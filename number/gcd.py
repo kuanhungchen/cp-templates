@@ -3,16 +3,9 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-def exgcd(a, b):
-    if b:
-        g, y, x = exgcd(b, a % b)
-        y -= x * (a // b)
-        return (g, x, y)
-    return (a, 1, 0)
-
 def lcm(a, b):
-    return a // gcd(a, b) * b
+    return (a * b) // gcd(a, b)
 
-def array_gcd(nums):
-    # O(n + log(max(A)))
-    return reduce(gcd, nums)
+def all_gcd(nums):
+    # O(n + log(min(A)))
+    return reduce(gcd, nums[1:], nums[0])
