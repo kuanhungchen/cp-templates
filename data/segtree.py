@@ -1,8 +1,9 @@
 class SegTree:
     def __init__(self, n, nums=None):
-        self.FUNC = min
-        self.DFLT = 1 << 60
+        self.FUNC = lambda a, b: a + b
+        self.DFLT = 0
 
+        self.n = n
         k = (n - 1).bit_length()
         self.n2 = 1 << k
         self.arr = arr = [self.DFLT for _ in range(1 << (k + 1))]
@@ -42,3 +43,29 @@ class SegTree:
             ql >>= 1
             qr >>= 1
         return ans
+
+    def bisect_left(self, val):
+        # first index where prefix sum >= val
+        if self.arr[1] < val:
+            return self.n
+        idx = 1
+        while idx < self.n2:
+            if self.arr[idx << 1] >= val:
+                idx = idx << 1
+            else:
+                val -= self.arr[idx << 1]
+                idx = idx << 1 | 1
+        return idx - self.n2
+
+    def bisect_right(self, val):
+        # first index where prefix sum > val
+        if self.arr[1] <= val:
+            return self.n
+        idx = 1
+        while idx < self.n2:
+            if self.arr[idx << 1] > val:
+                idx = idx << 1
+            else:
+                val -= self.arr[idx << 1]
+                idx = idx << 1 | 1
+        return idx - self.n2
