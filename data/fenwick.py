@@ -2,10 +2,11 @@ class Fenwick:
     def __init__(self, n, nums=None):
         self.n = n
         self.arr = [0 for _ in range(n + 1)]
-        if nums is not None: self.build(nums)
+        if nums:
+            self.arr[1:] = nums
+            self.__build()
 
-    def build(self, nums):
-        self.arr[1:] = nums.copy()
+    def __build(self):
         for i in range(1, self.n):
             if i + (i & -i) <= self.n:
                 self.arr[i + (i & -i)] += self.arr[i]
