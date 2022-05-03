@@ -12,11 +12,18 @@ class SegTree:
             self.__build()
 
     def __build(self):
-        for i in range(self.n2 - 1, -1, -1):
+        for i in range(self.n2 - 1, 0, -1):
             self.arr[i] = self.FUNC(self.arr[i << 1], self.arr[i << 1 | 1])
 
     def getval(self, idx):
         return self.arr[self.n2 + idx]
+
+    def getall(self):
+        return self.arr[1]
+
+    def getvals(self, ql, qr):
+        # [ql, qr)
+        return self.arr[self.n2 + ql:self.n2 + qr]
 
     def ptassign(self, idx, val):
         i = idx + self.n2
@@ -46,7 +53,7 @@ class SegTree:
 
     def bisect_left(self, val):
         # first index where prefix sum >= val
-        if self.arr[1] < val:
+        if self.getall() < val:
             return self.n
         idx = 1
         while idx < self.n2:
@@ -59,7 +66,7 @@ class SegTree:
 
     def bisect_right(self, val):
         # first index where prefix sum > val
-        if self.arr[1] <= val:
+        if self.getall() <= val:
             return self.n
         idx = 1
         while idx < self.n2:
