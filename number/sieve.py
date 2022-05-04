@@ -7,7 +7,6 @@ def eratosthenes(n):
         if is_prime[i]:
             for j in range(2 * i, n + 1, i):
                 is_prime[j] = False
-                print(j)
         i += 1
     primes = [i for i, flag in enumerate(is_prime) if flag]
     return primes, is_prime
@@ -36,7 +35,8 @@ def prime_factors(x, min_facts):
 
 
 def segment_sieve(ql, qr):
-    # [ql, qr), O(sqrt(qr) + (qr - ql)loglog(qr))
+    # [ql, qr)
+    # O(sqrt(qr) + (qr - ql)loglog(qr))
     is_prime_sqrt = [True for _ in range(int(qr ** 0.5) + 1)]
     is_prime_sqrt[0] = is_prime_sqrt[1] = False
     is_prime = [True for _ in range(qr - ql)]
