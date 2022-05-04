@@ -48,7 +48,7 @@ class PairingHeap:
 
     def decrease(self, node: Node, key: int):
         """decrease key of given node"""
-        if key <= node.key:
+        if not key <= node.key:
             raise RuntimeError("new key {} should be less than or equal to " \
                                 "original key {}.".format(key, node.key))
         node.key = key
