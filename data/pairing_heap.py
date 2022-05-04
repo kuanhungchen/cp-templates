@@ -2,85 +2,77 @@ from functools import reduce
 
 
 class Node:
-    def __init__(self, val, key=None):
-        self.val = val
-        self.key = key if key is not None else val
+    def __init__(self, key, val=None):
+        self.key = key
+        self.val = val if val is not None else key
         self.par = self.chd = self.bro = None
+
+    def __repr__(self):
+        return "Node(key={}, val={})".format(self.key, self.val)
 
 
 class PairingHeap:
-    def __init__(self, nums=None):
+    def __init__(self):
         self.rt = None
+        self.sz = 0
 
-        if nums is not None:
-            self.sz = len(nums)
-            for num in nums:
-                self.push(num)
-        else:
-            self.sz = 0
+    def __bool__(self) -> bool:
+        return self.sz != 0
 
-    def __bool__(self):
-        return bool(self.sz != 0)
-
-    def __len__(self):
+    def __len__(self) -> int:
         return self.sz
 
     @property
-    def top(self):
-        # assert self.sz > 0
-        return self.rt.val
+    def top(self) -> Node:
+        if not self:
+            raise IndexError("top from empty heap")
+        return self.rt
 
-    def pop(self):
-        # assert self.sz > 0
-        return self._pop().val
+    def pop(self) -> Node:
+        if not self:
+            return IndexError("pop from empty heap")
+        rt = self.rt
+        self.rt = self._pair(self.rt.chd)
+        self.sz -= 1
+        rt.par = rt.chd = rt.bro = None
+        return rt
 
-    def push(self, val, *, key=None):
-        """return a pointer to the node containing the new value"""
-        node = Node(val, key)
-        self.rt = node if not self.rt else self._merge(self.rt, node)
+    def push(self, node: Node):
+        self.rt = node if self.rt is None else self._merge(self.rt, node)
         self.sz += 1
-        return node
 
-    def merge(self, other):
+    def merge(self, other: "PairingHeap"):
         """merge with another pairing heap"""
         self.rt = self._merge(self.rt, other.rt)
         self.sz += other.sz
 
-    def decrease(self, node, key):
-        """given pointer to a node, assign its key with a smaller one"""
-
-        assert key <= node.key, "new key {} should be less than or equal " \
-                                "to original key{}.".format(key, node.key)
+    def decrease(self, node: Node, key: int):
+        """decrease key of given node"""
+        if key <= node.key:
+            raise RuntimeError("new key {} should be less than or equal to " \
+                                "original key {}.".format(key, node.key))
         node.key = key
         if node != self.rt:
-            par = node.par
-            if par.chd == node:
-                par.chd = node.bro
+            if node.par.chd == node:
+                node.par.chd = node.bro
             else:
-                par.bro = node.bro
+                node.par.bro = node.bro
             if node.bro:
-                node.bro.par = par
-            node.bro = node.par = None
+                node.bro.par = node.par
+            node.par = node.bro = None
             self.rt = self._merge(self.rt, node)
-
-    def _pop(self):
-        ret = self.rt
-        self.rt = self._pair(self.rt.chd)
-        self.sz -= 1
-        ret.par = ret.chd = ret.bro = None
-        return ret
 
     def _pair(self, node):
         arr = []
         while node and node.bro:
             cur, nxt = node.bro, node.bro.bro
-            node.bro = node.par = cur.bro = cur.par = None
+            node.par = node.bro = cur.par = cur.bro = None
             arr.append(self._merge(node, cur))
             node = nxt
         if node:
             node.bro = node.par = None
-            arr.append(node)
-        return reduce(self._merge, arr, None)
+        arr.reverse()
+        return reduce(self._merge, arr, node)
 
     @staticmethod
     def _merge(a, b):
@@ -92,4 +84,4 @@ class PairingHeap:
                 b.bro.par = b
             b.par = a
             return a
-        return a if a else b
+        return a if a is not None else b
