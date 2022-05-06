@@ -48,6 +48,9 @@ class PairingHeap:
 
     def decrease(self, node: Node, key: int):
         """decrease key of given node"""
+        if node != self.rt and node.par is None:
+            raise RuntimeError("given node {} have already been removed " \
+                                "from heap".format(node))
         if not key <= node.key:
             raise RuntimeError("new key {} should be less than or equal to " \
                                 "original key {}.".format(key, node.key))
@@ -61,6 +64,14 @@ class PairingHeap:
                 node.bro.par = node.par
             node.par = node.bro = None
             self.rt = self._merge(self.rt, node)
+
+    def remove(self, node: Node):
+        """remove the given node from heap"""
+        if node != self.rt and node.par is None:
+            raise RuntimeError("given node {} have already been removed " \
+                                "from heap".format(node))
+        self.decrease(node, float("-inf"))
+        self.pop()
 
     def _pair(self, node):
         arr = []
