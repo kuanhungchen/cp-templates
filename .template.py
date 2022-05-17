@@ -1,4 +1,4 @@
-from sys            import setrecursionlimit, stdin, stdout, stderr
+from sys            import stdin,  stderr, stdout, setrecursionlimit
 from bisect         import bisect_left, bisect_right
 from collections    import defaultdict, deque, Counter
 from itertools      import accumulate, combinations, permutations, product
@@ -8,16 +8,18 @@ from heapq          import heapify, heappush, heappop, heappushpop, heapreplace
 # set_param("max_unroll_recursion=-1")
 # setrecursionlimit(300005)
 INF   = 1 << 60
-MOD   = 10 ** 9 + 7
-# MOD   = 998244353
+MOD   = 998244353 + 1755654
 input = lambda: stdin.readline().rstrip("\r\n")
 dbg   = lambda *A, **M: stderr.write("\033[91m" + \
         M.get("sep", " ").join(map(str, A)) + M.get("end", "\n") + "\033[0m")
 # ============================ START OF MY CODE ============================ #
 
-def solve():
+def solve(_tc):
     pass
 
+
 if __name__ == "__main__":
-    for i in range(int(input())):
-        solve()
+    _tcs = int(input())
+    for _tc in range(1, vars().get("_tcs", 1) + 1):
+        dbg("=== Case {} ===".format(str(_tc).rjust(2)))
+        solve(_tc)

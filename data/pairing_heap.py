@@ -30,7 +30,9 @@ class PairingHeap:
 
     def pop(self) -> Node:
         if not self:
-            return IndexError("pop from empty heap")
+            raise IndexError("pop from empty heap")
+        if self.rt is None:
+            raise IndexError("pop from empty heap")
         rt = self.rt
         self.rt = self._pair(self.rt.chd)
         self.sz -= 1
