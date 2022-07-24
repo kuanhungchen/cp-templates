@@ -10,6 +10,7 @@ class Node:
     def __repr__(self):
         return "Node(key={}, val={})".format(self.key, self.val)
 
+MINIMUM_KEY = (float("-inf"), "")  # update this if key is not numeric
 
 class PairingHeap:
     def __init__(self):
@@ -48,7 +49,7 @@ class PairingHeap:
         self.rt = self._merge(self.rt, other.rt)
         self.sz += other.sz
 
-    def decrease(self, node: Node, key: int):
+    def decrease(self, node: Node, key):
         """decrease key of given node"""
         if node != self.rt and node.par is None:
             raise RuntimeError("given node {} have already been removed " \
@@ -72,7 +73,7 @@ class PairingHeap:
         if node != self.rt and node.par is None:
             raise RuntimeError("given node {} have already been removed " \
                                 "from heap".format(node))
-        self.decrease(node, float("-inf"))
+        self.decrease(node, MINIMUM_KEY)
         self.pop()
 
     def _pair(self, node):
