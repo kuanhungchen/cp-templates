@@ -45,9 +45,11 @@ class OrderedSet:
         return self.get(0)
 
     def pre(self, val):
+        # largest value less than or equal to val
         ans = self.fenw.bisect_left(self.fenw.pref(val + 1))
         return ans
 
     def nxt(self, val):
+        # smallest value greater than or equal to val
         ans = self.fenw.bisect_right(self.fenw.pref(val))
         return ans if ans != self.n else -1

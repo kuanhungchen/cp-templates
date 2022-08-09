@@ -312,7 +312,7 @@ class TreapHashSet(TreapMultiSet):
             super(TreapHashSet, self).__init__(self._keys)
         else:
             self._keys = set()
-    
+
     def add(self, key):
         if key not in self._keys:
             self._keys.add(key)
