@@ -1,7 +1,20 @@
-def eulertour(n, G, rt=None):
-    # Assume ST is sparse table built on depth array, then LCA(u, v) is
-    # ST.query(left, right + 1) & ((1 << 32) - 1),
-    # where left = min(first[u], first[v]), right = max(first[u], first[v]).
+def eulertour(n, G, rts=None):
+    """Get an Euler tour of a graph or a tree.
+
+    Return:
+        first: First timestamp of each node during the Euler tour. Length of n.
+        last:  Last timestamp of each node during the Euler tour. Length of n.
+        parent: Parent of each node during the Euler tour. Length of n.
+        euler: The actual Euler tour starting from given root(s). Length of 2n.
+        depth: Depth of each node during the Euler tour. Length of 2n.
+
+    Remarks:
+        1. To get real depth of each node, use (depth[v] >> 32).
+        2. Assume ST is a sparse table built on depth array, LCA(u, v) would
+           be ST.query(left, right + 1) & ((1 << 32) - 1), where
+           left = min(first[u], first[v]) and right = max(first[u], first[v]).
+        3. G can be either adj lists or edges.
+    """
     def bfs(node):
         dep = 0
         stk = [[node, 0]]
@@ -36,6 +49,12 @@ def eulertour(n, G, rt=None):
     euler = []
     depth = []
 
-    rts = [rt] if rt is not None else range(n)
-    all(bfs(rt) for rt in rts if parent[rt] == -1)
-    return first, last, euler, depth
+    if rts is None:
+        rts = range(n)
+    elif isinstance(rts, int):
+        rts = [rts]
+
+    for rt in rts:
+        if parent[rt] == -1:
+            bfs(rt)
+    return first, last, parent, euler, depth
