@@ -1,4 +1,4 @@
-import random
+from random import randint
 
 
 class SafeDict(dict):
@@ -6,8 +6,8 @@ class SafeDict(dict):
         super().__init__()
 
         self._keys = set()
-        self._xor1 = random.randint(1 << 30, 1 << 60)
-        self._xor2 = random.randint(1 << 30, 1 << 60)
+        self._xor1 = randint(1 << 30, 1 << 60)
+        self._xor2 = randint(1 << 30, 1 << 60)
         self._hash = lambda x: x ^ self._xor1 ^ self._xor2
         self._ihash = self._hash
 
@@ -33,17 +33,17 @@ class SafeDict(dict):
             yield self._ihash(key)
 
     def values(self):
-        return super().values()
+        for value in super().values():
+            yield value
 
     def items(self):
         for key, value in super().items():
             yield self._ihash(key), value
 
     def __str__(self):
-        s = ["{}: {}".format(self._ihash(key), value)
-                for key, value in super().items()]
-        s = ", ".join(s)
-        return "{" + s + "}"
+        s = "{" + ",".join(["{}: {}".format(self._ihash(key), value)
+            for key, value in super().items()]) + "}"
+        return s
 
 
 class SafeDefaultDict(SafeDict):
