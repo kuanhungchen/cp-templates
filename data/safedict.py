@@ -28,6 +28,12 @@ class SafeDict(dict):
     def __contains__(self, item):
         return self._hash(item) in self._keys
 
+    def copy(self):
+        new_dict = SafeDict()
+        for key, value in self.items():
+            new_dict[key] = value
+        return new_dict
+
     def keys(self):
         for key in self._keys:
             yield self._ihash(key)
@@ -41,7 +47,7 @@ class SafeDict(dict):
             yield self._ihash(key), value
 
     def __str__(self):
-        s = "{" + ",".join(["{}: {}".format(self._ihash(key), value)
+        s = "{" + ", ".join(["{}: {}".format(self._ihash(key), value)
             for key, value in super().items()]) + "}"
         return s
 
