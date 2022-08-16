@@ -29,7 +29,7 @@ class Mo:
             B[ql // SZ].append(qi)
 
         for bi in range(NUM):
-            B[bi].sort(key=lambda qi: queries[qi][1], reverse=bi & 1)
+            B[bi].sort(key=lambda qi: queries[qi][1], reverse=bool(bi & 1))
 
         L, R = 0, -1
         ans = [0 for _ in range(self.q)]
