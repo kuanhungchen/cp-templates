@@ -42,7 +42,7 @@ def segment_sieve(L, R):
 
     is_prime = [True for _ in range(R - L + 1)]
     for p in primes:
-        for j in range(max(p * p, ((ql + p - 1) // p) * p), R + 1, p):
+        for j in range(max(p * p, ((L + p - 1) // p) * p), R + 1, p):
             is_prime[j - L] = False
     if L == 1:
         is_prime[0] = False
