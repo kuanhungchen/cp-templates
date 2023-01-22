@@ -34,27 +34,16 @@ def prime_factors(x, min_facts):
     return facts
 
 
-def segment_sieve(ql, qr):
-    # [ql, qr)
-    # O(sqrt(qr) + (qr - ql)loglog(qr))
-    is_prime_sqrt = [True for _ in range(int(qr ** 0.5) + 1)]
-    is_prime_sqrt[0] = is_prime_sqrt[1] = False
-    is_prime = [True for _ in range(qr - ql)]
+def segment_sieve(L, R):
+    # [L, R]
+    # O((R - L + 1)loglogR + sqrt(R)loglog(sqrt(R)))
+    # is_prime[idx] = True means the value `idx` is a prime.
+    primes, _ = linear_sieve(int(R ** 0.5))
 
-    if ql == 0:
-        is_prime[0] = is_prime[1] = False
-    if ql == 1:
+    is_prime = [True for _ in range(R - L + 1)]
+    for p in primes:
+        for j in range(max(p * p, ((ql + p - 1) // p) * p), R + 1, p):
+            is_prime[j - L] = False
+    if L == 1:
         is_prime[0] = False
-
-    i = 2
-    while i * i <= qr:
-        if is_prime_sqrt[i]:
-            j = 2
-            while j * j <= qr:
-                is_prime_sqrt[j] = False
-                j += i
-            for j in range(max((ql + i - 1) // i, 2) * i, qr, i):
-                is_prime[j - ql] = False
-        i += 1
-    primes = [ql + i for i, flag in enumerate(is_prime) if flag]
-    return primes
+    return is_prime
