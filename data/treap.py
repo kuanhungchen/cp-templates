@@ -1,5 +1,11 @@
 import random
 
+"""
+Elements are key-value pairs? use TreapHashMap.
+Elements' actual occurences don't matter? use TreapHashSet.
+Elements can be duplicate and occurences matter? use TreapMultiSet.
+"""
+
 
 class TreapMultiSet:
     rt = 0
@@ -29,18 +35,22 @@ class TreapMultiSet:
             pass
 
     def ceiling(self, key):
+        # return the first value x >= key, or None if not exists
         x = self._ceiling(key)
         return self.keys[x] if x else None
 
     def higher(self, key):
+        # return the first value x > key, or None if not exists
         x = self._higher(key)
         return self.keys[x] if x else None
 
     def floor(self, key):
+        # return the first value x <= key, or None if not exists
         x = self._floor(key)
         return self.keys[x] if x else None
 
     def lower(self, key):
+        # return the first value x < key, or None if not exists
         x = self._lower(key)
         return self.keys[x] if x else None
 
@@ -88,7 +98,7 @@ class TreapMultiSet:
         def helper(beg, end):
             if beg == end:
                 return 0
-            mid = (beg + end) << 1
+            mid = (beg + end) >> 1
             rt = self._create_node(nums[mid])
             lchd[rt] = helper(beg, mid)
             rchd[rt] = helper(mid + 1, end)
@@ -287,29 +297,11 @@ class TreapMultiSet:
         return rt
 
 
-class TreapSet(TreapMultiSet):
-    def add(self, key):
-        self.rt, duplicate = self._insert_unique(key)
-        if not duplicate:
-            self.sz += 1
-
-    def _insert_unique(self, key):
-        if not self.rt:
-            return self._create_node(key), False
-        l, r = self._split(key)
-        if l and self.keys[l] == key:
-            return self._merge(l, r), True
-        return self._merge(self._merge(l, self._create_node(key)), r), False
-
-    def __repr__(self):
-        return "TreapSet({})".format(list(self))
-
-
 class TreapHashSet(TreapMultiSet):
     def __init__(self, nums=None):
         if nums:
             self._keys = set(nums)
-            super(TreapHashSet, self).__init__(self._keys)
+            super(TreapHashSet, self).__init__(list(self._keys))
         else:
             self._keys = set()
 
@@ -319,7 +311,7 @@ class TreapHashSet(TreapMultiSet):
             super(TreapHashSet, self).add(key)
 
     def remove(self, key):
-        self.keys.remove(key)
+        self._keys.remove(key)
         super(TreapHashSet, self).remove(key)
 
     def discard(self, key):
@@ -337,7 +329,7 @@ class TreapHashMap(TreapMultiSet):
     def __init__(self, nums=None):
         if nums:
             self._map = dict(nums)
-            super(TreapHashMap, self).__init__(self._map.keys())
+            super(TreapHashMap, self).__init__(list(self._map.keys()))
         else:
             self._map = dict()
 
@@ -353,7 +345,7 @@ class TreapHashMap(TreapMultiSet):
         raise TypeError("add on TreapHashMap")
 
     def get(self, key, dflt=None):
-        return self._map.get(key, dflt=dflt)
+        return self._map.get(key, dflt)
 
     def remove(self, key):
         self._map.pop(key)
@@ -368,3 +360,4 @@ class TreapHashMap(TreapMultiSet):
 
     def __repr__(self):
         return "TreapHashMap({})".format(list(self))
+
