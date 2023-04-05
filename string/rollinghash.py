@@ -1,5 +1,5 @@
 class RollingHash:
-    def __init__(self, s, P=3001, MOD=1101001001):
+    def __init__(self, s, P=123457, MOD=1011001110001111):
         self.MOD = MOD
 
         orda = ord("a")
