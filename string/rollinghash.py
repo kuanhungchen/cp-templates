@@ -1,5 +1,5 @@
 class RollingHash:
-    def __init__(self, s, P=123457, MOD=1011001110001111):
+    def __init__(self, s, P=3001, MOD=1101001001):
         self.MOD = MOD
 
         orda = ord("a")
@@ -9,6 +9,14 @@ class RollingHash:
         for c in s:
             ps.append(ps[-1] * P % MOD)
             hs.append((hs[-1] * P + (ord(c) - orda + 1)) % MOD)
+
+    @property
+    def hashv(self):
+        return self.hs[-1]
+
+    def prefix(self, qr):
+        # [0, qr)
+        return self.get(0, qr)
 
     def get(self, ql, qr):
         # [ql, qr)
