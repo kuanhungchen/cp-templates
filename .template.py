@@ -8,13 +8,15 @@ from inspect        import currentframe
 # from pypyjit        import set_param
 # set_param("max_unroll_recursion=-1")
 # setrecursionlimit(300005)
+orda  = 97
 INF   = 1 << 60
 MOD   = 1000000007
 MOD2  = 998244353
 input = lambda: stdin.readline().rstrip("\r\n")
 linen = lambda cf_: "[L" + str(cf_.f_back.f_lineno) + "] "
 dbg   = lambda *A, **M: stderr.write("\033[91m" + \
-        ("" if not M.get("lineno", True) else linen(currentframe()) + \
+        M.get("sep", " ").join(map(str, A)) + M.get("end", "\n") + "\033[0m")
+dbgl  = lambda *A, **M: stderr.write("\033[91m" + linen(currentframe()) + \
         M.get("sep", " ").join(map(str, A)) + M.get("end", "\n") + "\033[0m")
 # ============================ START OF MY CODE ============================ #
 
@@ -25,5 +27,5 @@ def solve(_tc):
 if __name__ == "__main__":
     _tcs = int(input())
     for _tc in range(1, vars().get("_tcs", 1) + 1):
-        dbg("=== Case {} ===".format(str(_tc).rjust(2)), lineno=False)
+        dbg("=== Case {} ===".format(str(_tc).rjust(2)))
         solve(_tc)
