@@ -1,45 +1,65 @@
 class Mo:
-    def __init__(self, n):
-        self.n = n
-        self.q = 0
-
+    def __init__(self, arr):
+        self.arr = arr
+        self.n = len(arr)
         self.queries = []
+        self.L = 0
+        self.R = -1
 
     def add_query(self, ql, qr):
         # [ql, qr]
         self.queries.append((ql, qr))
-        self.q += 1
+
+    def _init(self):
+        # TODO: add required information
+        self.ans = [0 for _ in range(len(self.queries))]
+
+    def _add(self, idx):
+        # TODO: include self.arr[idx]
+        _ = self.arr[idx]
+        raise NotImplementedError
+
+    def _rem(self, idx):
+        # TODO: exclude self.arr[idx]
+        _ = self.arr[idx]
+        raise NotImplementedError
+
+    def _out(self, qidx):
+        # TODO: construct answer for a query
+        self.ans[qidx] = 0
+        raise NotImplementedError
+
+    def _solve_bucket(self, ql, qr):
+        for i in range(self.L, ql):
+            self._rem(i)
+        for i in range(self.R, qr, -1):
+            self._rem(i)
+        for i in range(self.R + 1, qr + 1):
+            self._add(i)
+        for i in range(self.L - 1, ql - 1, -1):
+            self._add(i)
+
+        self.L = ql
+        self.R = qr
 
     def solve(self):
-        def add(idx):
-            raise NotImplementedError
-
-        def remove(idx):
-            raise NotImplementedError
-
-        def out(idx):
-            raise NotImplementedError
+        self._init()
 
         queries = self.queries
-        SZ = 128
+        SZ = round(pow(len(queries), 0.5))
         NUM = (self.n + SZ - 1) // SZ
-        B = [[] for _ in range(NUM)]
+        BS = [[] for _ in range(NUM)]
 
         for qi, (ql, qr) in enumerate(queries):
-            B[ql // SZ].append(qi)
+            BS[ql // SZ].append(qi)
 
         for bi in range(NUM):
-            B[bi].sort(key=lambda qi: queries[qi][1], reverse=bool(bi & 1))
+            BS[bi].sort(key=lambda qi: queries[qi][1], reverse=bool(bi & 1))
 
-        L, R = 0, -1
-        ans = [0 for _ in range(self.q)]
-        for qis in B:
-            for qi in qis:
+        for B in BS:
+            for qi in B:
                 ql, qr = queries[qi]
-                for i in range(L, ql): remove(i)
-                for i in range(R, qr, -1): remove(i)
-                for i in range(R + 1, qr + 1): add(i)
-                for i in range(L - 1, ql - 1, -1): add(i)
-                L, R = ql, qr
-                out(qi)
-        return ans
+                self._solve_bucket(ql, qr)
+                self._out(qi)
+
+        return self.ans
