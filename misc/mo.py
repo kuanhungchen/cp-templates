@@ -29,7 +29,7 @@ class Mo:
         self.ans[qidx] = 0
         raise NotImplementedError
 
-    def _solve_bucket(self, ql, qr):
+    def _solve_query(self, ql, qr):
         for i in range(self.L, ql):
             self._rem(i)
         for i in range(self.R, qr, -1):
@@ -59,7 +59,7 @@ class Mo:
         for B in BS:
             for qi in B:
                 ql, qr = queries[qi]
-                self._solve_bucket(ql, qr)
+                self._solve_query(ql, qr)
                 self._out(qi)
 
         return self.ans
