@@ -14,30 +14,27 @@ class Mo:
         # TODO: add required information
         self.ans = [0 for _ in range(len(self.queries))]
 
-    def _add(self, idx):
+    def _add(self, idx, is_left):
         # TODO: include self.arr[idx]
-        _ = self.arr[idx]
         raise NotImplementedError
 
-    def _rem(self, idx):
+    def _rem(self, idx, is_left):
         # TODO: exclude self.arr[idx]
-        _ = self.arr[idx]
         raise NotImplementedError
 
     def _out(self, qidx):
         # TODO: construct answer for a query
-        self.ans[qidx] = 0
         raise NotImplementedError
 
     def _solve_query(self, ql, qr):
-        for i in range(self.L, ql):
-            self._rem(i)
-        for i in range(self.R, qr, -1):
-            self._rem(i)
-        for i in range(self.R + 1, qr + 1):
-            self._add(i)
-        for i in range(self.L - 1, ql - 1, -1):
-            self._add(i)
+        for r in range(self.R + 1, qr + 1):
+            self._add(r, False)
+        for l in range(self.L - 1, ql - 1, -1):
+            self._add(l, True)
+        for r in range(self.R, qr, -1):
+            self._rem(r, False)
+        for l in range(self.L, ql):
+            self._rem(l, True)
 
         self.L = ql
         self.R = qr
