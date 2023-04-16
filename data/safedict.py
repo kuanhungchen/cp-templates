@@ -1,55 +1,87 @@
+from functools import reduce
 from random import randint
 
 
 class SafeDict(dict):
-    def __init__(self):
+    def __init__(self, mp=None, **kvs):
         super().__init__()
-
-        self._keys = set()
+        self._hash2key = {}
         self._xor1 = randint(1 << 30, 1 << 60)
         self._xor2 = randint(1 << 30, 1 << 60)
-        self._hash = lambda x: x ^ self._xor1 ^ self._xor2
-        self._ihash = self._hash
+        self._mod = 1011001110001111
+
+        assert mp is None or isinstance(mp, dict)
+        if mp is not None:
+            for (k, v) in mp.items():
+                self.__setitem__(k, v)
+        for (k, v) in kvs.items():
+            self.__setitem__(k, v)
+
+    def _hash(self, *x):
+        return reduce(
+            lambda hashv, elem:
+            (hashv + hash(elem) ^ self._xor1 ^ self._xor2) % self._mod, x, 0)
 
     def __missing__(self, key):
-        raise KeyError(self._ihash(key))
+        raise KeyError(key)
 
     def __setitem__(self, key, value):
-        super().__setitem__(self._hash(key), value)
-        self._keys.add(self._hash(key))
+        hashv = self._hash(key)
+        super().__setitem__(hashv, value)
+        self._hash2key[hashv] = key
 
-    def __getitem__(self, item):
-        return super().__getitem__(self._hash(item))
+    def __getitem__(self, key):
+        _ = self.__contains__(key) or self.__missing__(key)
+        return super().__getitem__(self._hash(key))
 
-    def __delitem__(self, item):
-        super().__delitem__(self._hash(item))
-        self._keys.discard(self._hash(item))
+    def __delitem__(self, key):
+        _ = self.__contains__(key) or self.__missing__(key)
+        hashv = self._hash(key)
+        super().__delitem__(hashv)
+        del self._hash2key[hashv]
 
-    def __contains__(self, item):
-        return self._hash(item) in self._keys
-
-    def copy(self):
-        new_dict = SafeDict()
-        for key, value in self.items():
-            new_dict[key] = value
-        return new_dict
-
-    def keys(self):
-        for key in self._keys:
-            yield self._ihash(key)
-
-    def values(self):
-        for value in super().values():
-            yield value
-
-    def items(self):
-        for key, value in super().items():
-            yield self._ihash(key), value
+    def __contains__(self, key):
+        return self._hash(key) in self._hash2key
 
     def __str__(self):
-        s = "{" + ", ".join(["{}: {}".format(self._ihash(key), value)
-            for key, value in super().items()]) + "}"
-        return s
+        param = lambda v: "'" + v + "'" if isinstance(v, str) else str(v)
+        return "{" + ", ".join("{}: {}".format(
+            param(self._hash2key[hashv]), param(value))
+            for hashv, value in super().items()) + "}"
+
+    def clear(self):
+        self._hash2key.clear()
+        super().clear()
+
+    def copy(self):
+        return SafeDict(self)
+
+    def get(self, key):
+        return self.__getitem__(key)
+
+    def items(self):
+        for hashv, value in super().items():
+            yield self._hash2key[hashv], value
+
+    def keys(self):
+        for key in self._hash2key.values():
+            yield key
+
+    def pop(self, key):
+        _ = self.__contains__(key) or self.__missing__(key)
+        hashv = self._hash(key)
+        del self._hash2key[hashv]
+        return super().pop(hashv)
+
+    def popitem(self):
+        hashv, value = super().popitem()
+        key = self._hash2key.pop(hashv)
+        return (key, value)
+
+    def setdefault(self, key, default):
+        return self.__getitem__(key) \
+                if self.__contains__(key) \
+                else self.__setitem__(key, default) or default
 
 
 class SafeDefaultDict(SafeDict):
@@ -58,4 +90,4 @@ class SafeDefaultDict(SafeDict):
         self._default = default
 
     def __missing__(self, key):
-        return self._default
+        self.__setitem__(key, self._default)
