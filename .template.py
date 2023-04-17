@@ -9,6 +9,7 @@ from inspect        import currentframe
 # set_param("max_unroll_recursion=-1")
 # setrecursionlimit(300005)
 orda  = 97
+ordA  = 65
 INF   = 1 << 60
 MOD   = 1000000007
 MOD2  = 998244353
