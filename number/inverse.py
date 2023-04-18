@@ -10,4 +10,5 @@ def inverse(a, mod):
     return (x + mod) % mod if g == 1 else -1
 
 def inverse_prime(a, mod):
+    # mod needs to be prime
     return pow(a, mod - 2, mod)
