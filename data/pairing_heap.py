@@ -25,7 +25,7 @@ class PairingHeap:
 
     @property
     def top(self) -> Node:
-        if not self:
+        if self.rt is None:
             raise IndexError("top from empty heap")
         return self.rt
 
@@ -59,7 +59,7 @@ class PairingHeap:
                                 "original key {}.".format(key, node.key))
         node.key = key
         if node != self.rt:
-            if node.par.chd == node:
+            if node.par and node.par.chd and node.par.chd == node:
                 node.par.chd = node.bro
             else:
                 node.par.bro = node.bro
