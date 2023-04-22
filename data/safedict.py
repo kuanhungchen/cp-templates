@@ -6,9 +6,7 @@ class SafeDict(dict):
     def __init__(self, mp=None, **kvs):
         super().__init__()
         self._hash2key = {}
-        self._xor1 = randint(1 << 30, 1 << 60)
-        self._xor2 = randint(1 << 30, 1 << 60)
-        self._mod = 1011001110001111
+        self._xor = randint(1 << 30, 1 << 40)
 
         assert mp is None or isinstance(mp, dict)
         if mp is not None:
@@ -18,9 +16,7 @@ class SafeDict(dict):
             self.__setitem__(k, v)
 
     def _hash(self, *x):
-        return reduce(
-            lambda hashv, elem:
-            (hashv + hash(elem) ^ self._xor1 ^ self._xor2) % self._mod, x, 0)
+        return reduce(lambda a, b: a ^ b, x, 0) ^ self._xor
 
     def __missing__(self, key):
         raise KeyError(key)
