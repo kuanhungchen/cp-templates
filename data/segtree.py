@@ -51,28 +51,24 @@ class SegTree:
             qr >>= 1
         return ans
 
-    def bisect_left(self, val):
-        # first index where prefix sum >= val
-        if self.getall() < val:
+    def rightmost(self, ql, condition):
+        # return first index idx such that [ql, idx] unsatisfies condition
+        # bisect_left(val)  <-> lambda x: x <  val <-> sum of [l, idx] >= val
+        # bisect_right(val) <-> lambda x: x <= val <-> sum of [l, idx] >  val
+        if ql == self.n:
             return self.n
-        idx = 1
-        while idx < self.n2:
-            if self.arr[idx << 1] >= val:
-                idx = idx << 1
-            else:
-                val -= self.arr[idx << 1]
-                idx = idx << 1 | 1
-        return idx - self.n2
-
-    def bisect_right(self, val):
-        # first index where prefix sum > val
-        if self.getall() <= val:
-            return self.n
-        idx = 1
-        while idx < self.n2:
-            if self.arr[idx << 1] > val:
-                idx = idx << 1
-            else:
-                val -= self.arr[idx << 1]
-                idx = idx << 1 | 1
-        return idx - self.n2
+        idx = idx0 = ql + self.n2
+        curv = self.DFLT
+        while idx == idx0 or (idx & (idx - 1)):
+            while not idx & 1:
+                idx >>= 1
+            if not condition(self.FUNC(curv, self.arr[idx])):
+                while idx < self.n2:
+                    idx <<= 1
+                    if condition(self.FUNC(curv, self.arr[idx])):
+                        curv = self.FUNC(curv, self.arr[idx])
+                        idx += 1
+                return idx - self.n2
+            curv = self.FUNC(curv, self.arr[idx])
+            idx += 1
+        return self.n
