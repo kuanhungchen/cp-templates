@@ -1,70 +1,70 @@
 import random
 
-"""
-Elements are key-value pairs? use TreapHashMap.
-Elements' actual occurences don't matter? use TreapHashSet.
-Elements can be duplicate and occurences matter? use TreapMultiSet.
-"""
-
 
 class TreapMultiSet:
-    rt = 0
-    sz = 0
-    lchd = [0]
-    rchd = [0]
-    keys = [0]
-    pris = [0.0]
-
     def __init__(self, nums=None):
+        self._rt = 0
+        self._sz = 0  # number of total elements
+        self._lchd = [0]
+        self._rchd = [0]
+        self._keys = [0]
+        self._pris = [0.0]
+
         if nums:
-            self.rt = self._build(nums)
-            self.sz = len(nums)
+            self._rt = self._build(nums)
+            self._sz = len(nums)
 
     def add(self, key):
-        self.rt = self._insert(key)
-        self.sz += 1
+        # add one occurence for key
+        self._rt = self._insert(key)
+        self._sz += 1
 
     def remove(self, key):
-        self.rt = self._erase(key)
-        self.sz -= 1
+        # remove one element for key, raise KeyError if not exists
+        self._rt = self._erase(key)
+        self._sz -= 1
 
     def discard(self, key):
+        # safe remove
         try:
             self.remove(key)
         except KeyError:
             pass
 
     def ceiling(self, key):
-        # return the first value x >= key, or None if not exists
+        # return the first element x >= key, or None if not exists
         x = self._ceiling(key)
-        return self.keys[x] if x else None
+        return self._keys[x] if x else None
 
     def higher(self, key):
-        # return the first value x > key, or None if not exists
+        # return the first element x > key, or None if not exists
         x = self._higher(key)
-        return self.keys[x] if x else None
+        return self._keys[x] if x else None
 
     def floor(self, key):
-        # return the first value x <= key, or None if not exists
+        # return the first element x <= key, or None if not exists
         x = self._floor(key)
-        return self.keys[x] if x else None
+        return self._keys[x] if x else None
 
     def lower(self, key):
-        # return the first value x < key, or None if not exists
+        # return the first element x < key, or None if not exists
         x = self._lower(key)
-        return self.keys[x] if x else None
+        return self._keys[x] if x else None
 
+    @property
     def max(self):
-        return self.keys[self._max()]
+        return self._keys[self._max()]
 
+    @property
     def min(self):
-        return self.keys[self._min()]
+        return self._keys[self._min()]
 
     def __len__(self):
-        return self.sz
+        # return number of all elements
+        return self._sz
 
     def __nonzero__(self):
-        return bool(self.rt)
+        return bool(self._rt)
 
     __bool__ = __nonzero__
 
@@ -75,13 +75,14 @@ class TreapMultiSet:
         return "TreapMultiSet({})".format(list(self))
 
     def __iter__(self):
-        if not self.rt:
+        # iterate all elements in ascending order
+        if not self._rt:
             return iter([])
         out = []
-        stk = [self.rt]
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        stk = [self._rt]
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while stk:
             node = stk.pop()
             if node > 0:
@@ -122,47 +123,48 @@ class TreapMultiSet:
             return rt
 
         nums.sort()
-        lchd = self.lchd
-        rchd = self.rchd
-        pris = self.pris
+        lchd = self._lchd
+        rchd = self._rchd
+        pris = self._pris
         return helper(0, len(nums))
 
     def _create_node(self, key):
-        self.keys.append(key)
-        self.pris.append(random.random())
-        self.lchd.append(0)
-        self.rchd.append(0)
-        return len(self.keys) - 1
+        self._keys.append(key)
+        self._pris.append(random.random())
+        self._lchd.append(0)
+        self._rchd.append(0)
+        return len(self._keys) - 1
 
     def _insert(self, key):
-        if not self.rt:
+        if not self._rt:
             return self._create_node(key)
         l, r = self._split(key)
         return self._merge(self._merge(l, self._create_node(key)), r)
 
     def _erase(self, key):
-        if not self.rt:
+        if not self._rt:
             raise KeyError(key)
-        if self.keys[self.rt] == key:
-            return self._merge(self.lchd[self.rt], self.rchd[self.rt])
-        node = rt = self.rt
-        while rt and self.keys[rt] != key:
+        if self._keys[self._rt] == key:
+            return self._merge(self._lchd[self._rt], self._rchd[self._rt])
+        node = rt = self._rt
+        parent = rt
+        while rt and self._keys[rt] != key:
             parent = rt
-            rt = self.lchd[rt] if key < self.keys[rt] else self.rchd[rt]
+            rt = self._lchd[rt] if key < self._keys[rt] else self._rchd[rt]
         if not rt:
             raise KeyError(key)
-        if rt == self.lchd[parent]:
-            self.lchd[parent] = self._merge(self.lchd[rt], self.rchd[rt])
+        if rt == self._lchd[parent]:
+            self._lchd[parent] = self._merge(self._lchd[rt], self._rchd[rt])
         else:
-            self.rchd[parent] = self._merge(self.lchd[rt], self.rchd[rt])
+            self._rchd[parent] = self._merge(self._lchd[rt], self._rchd[rt])
         return node
 
     def _split(self, key):
         lp = rp = 0
-        rt = self.rt
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        rt = self._rt
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while rt:
             if key < keys[rt]:
                 lchd[rp] = rp = rt
@@ -175,10 +177,10 @@ class TreapMultiSet:
         return l, r
 
     def _merge(self, l, r):
-        lchd = self.lchd
-        rchd = self.rchd
-        pris = self.pris
-        where = self.lchd
+        lchd = self._lchd
+        rchd = self._rchd
+        pris = self._pris
+        where = self._lchd
         pos = 0
         while l and r:
             if pris[l] > pris[r]:
@@ -195,10 +197,10 @@ class TreapMultiSet:
         return node
 
     def _ceiling(self, key):
-        rt = self.rt
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        rt = self._rt
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while rt and keys[rt] < key:
             rt = rchd[rt]
         if not rt:
@@ -216,10 +218,10 @@ class TreapMultiSet:
         return min_node
 
     def _higher(self, key):
-        rt = self.rt
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        rt = self._rt
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while rt and keys[rt] <= key:
             rt = rchd[rt]
         if not rt:
@@ -237,10 +239,10 @@ class TreapMultiSet:
         return min_node
 
     def _floor(self, key):
-        rt = self.rt
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        rt = self._rt
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while rt and keys[rt] > key:
             rt = lchd[rt]
         if not rt:
@@ -258,10 +260,10 @@ class TreapMultiSet:
         return max_node
 
     def _lower(self, key):
-        rt = self.rt
-        lchd = self.lchd
-        rchd = self.rchd
-        keys = self.keys
+        rt = self._rt
+        lchd = self._lchd
+        rchd = self._rchd
+        keys = self._keys
         while rt and keys[rt] >= key:
             rt = lchd[rt]
         if not rt:
@@ -279,19 +281,19 @@ class TreapMultiSet:
         return max_node
 
     def _max(self):
-        if not self.rt:
+        if not self._rt:
             raise ValueError("max on empty treap")
-        rt = self.rt
-        rchd = self.rchd
+        rt = self._rt
+        rchd = self._rchd
         while rchd[rt]:
             rt = rchd[rt]
         return rt
 
     def _min(self):
-        if not self.rt:
+        if not self._rt:
             raise ValueError("min on empty treap")
-        rt = self.rt
-        lchd = self.lchd
+        rt = self._rt
+        lchd = self._lchd
         while lchd[rt]:
             rt = lchd[rt]
         return rt
@@ -300,64 +302,63 @@ class TreapMultiSet:
 class TreapHashSet(TreapMultiSet):
     def __init__(self, nums=None):
         if nums:
-            self._keys = set(nums)
-            super(TreapHashSet, self).__init__(list(self._keys))
+            self._internal_keys = set(nums)
+            super(TreapHashSet, self).__init__(list(self._internal_keys))
         else:
-            self._keys = set()
+            self._internal_keys = set()
 
     def add(self, key):
-        if key not in self._keys:
-            self._keys.add(key)
+        if key not in self._internal_keys:
+            self._internal_keys.add(key)
             super(TreapHashSet, self).add(key)
 
     def remove(self, key):
-        self._keys.remove(key)
+        self._internal_keys.remove(key)
         super(TreapHashSet, self).remove(key)
 
     def discard(self, key):
-        if key in self._keys:
+        if key in self._internal_keys:
             self.remove(key)
 
     def __contains__(self, key):
-        return key in self._keys
+        return key in self._internal_keys
 
     def __repr__(self):
         return "TreapHashSet({})".format(list(self))
 
 
 class TreapHashMap(TreapMultiSet):
-    def __init__(self, nums=None):
-        if nums:
-            self._map = dict(nums)
-            super(TreapHashMap, self).__init__(list(self._map.keys()))
-        else:
-            self._map = dict()
+    def __init__(self, dict_=None):
+        self._internal_dict = dict()
+        if dict_:
+            self._internal_dict = dict_
+            super(TreapHashMap, self).__init__(list(dict_.keys()))
 
     def __setitem__(self, key, value):
-        if key not in self._map:
+        if key not in self._internal_dict:
             super(TreapHashMap, self).add(key)
-        self._map[key] = value
+        self._internal_dict[key] = value
 
     def __getitem__(self, key):
-        return self._map[key]
+        return self._internal_dict[key]
 
     def add(self, key):
         raise TypeError("add on TreapHashMap")
 
-    def get(self, key, dflt=None):
-        return self._map.get(key, dflt)
+    def get(self, key, default=None):
+        return self._internal_dict.get(key, default)
 
     def remove(self, key):
-        self._map.pop(key)
+        self._internal_dict.pop(key)
         super(TreapHashMap, self).remove(key)
 
     def discard(self, key):
-        if key in self._map:
+        if key in self._internal_dict:
             self.remove(key)
 
     def __contains__(self, key):
-        return key in self._map
+        return key in self._internal_dict
 
     def __repr__(self):
-        return "TreapHashMap({})".format(list(self))
-
+        return "TreapHashMap({{{}}})".format(
+                ", ".join("{}: {}".format(key, self.get(key)) for key in self))
