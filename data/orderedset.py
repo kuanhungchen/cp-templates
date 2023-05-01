@@ -21,16 +21,16 @@ class OrderedSet:
 
     @property
     def max(self):
-        return self.get(-1)
+        return self.kth(-1)
 
     @property
     def min(self):
-        return self.get(0)
+        return self.kth(0)
 
     def median(self, ceil=False):
         # return median of elements, or -1 if not exists
-        if self._sz & 1 or ceil: return self.get(self._sz // 2)
-        return self.get((self._sz - 1) // 2)
+        if self._sz & 1 or ceil: return self.kth(self._sz // 2)
+        return self.kth((self._sz - 1) // 2)
 
     def add(self, val):
         self._check(val)
@@ -48,11 +48,11 @@ class OrderedSet:
         self._sz -= 1
         return True
 
-    def get(self, rnk):
-        # return element of rnk (0-indexed), or -1 if not exists
-        if not -self._sz <= rnk < self._sz: return -1
-        if rnk < 0: return self.get(self._sz + rnk)
-        return self._fenw.bisect_left(rnk + 1)
+    def kth(self, k):
+        # return element of rank k (0-indexed), or -1 if not exists
+        if not -self._sz <= k < self._sz: return -1
+        if k < 0: return self.kth(self._sz + k)
+        return self._fenw.bisect_left(k + 1)
 
     def rank(self, val):
         # return the rank of val (0-indexed), or -1 if not exists
