@@ -81,5 +81,37 @@ class OrderedSet:
 
     def __iter__(self):
         for val in range(self._maxn):
-            for f in range(self._freq[val]):
+            for _ in range(self._freq[val]):
                 yield val
+
+
+class OrderedMultiSet(OrderedSet):
+    def __init__(self, maxn, nums=None):
+        self._maxn = maxn  # nums can be only [0, maxn - 1]
+        self._freq = [0 for _ in range(maxn)]
+        if nums:
+            for num in nums:
+                self._check(num)
+                self._freq[num] += 1
+        self._fenw = Fenwick(maxn, self._freq)
+        self._sz = self._fenw.pref(maxn)
+
+    def count(self, val):
+        # return occurence of val
+        self._check(val)
+        return self._fenw.query(val, val + 1)
+
+    def update(self, val, delta):
+        # add or remove occurence of val
+        self._check(val)
+        if self.count(val) + delta < 0: return True
+        self._fenw.add(val, delta)
+        self._freq[val] += delta
+        self._sz += delta
+        return True
+
+    def add(self, val):
+        self.update(val, 1)
+
+    def remove(self, val):
+        self.update(val, -1)
