@@ -3,14 +3,15 @@ from fenwick import Fenwick
 
 class OrderedSet:
     def __init__(self, maxn, nums=None):
-        # nums should be unique
         self._maxn = maxn # nums can be only [0, maxn - 1]
         self._sz = 0
         if nums:
-            self._sz = len(nums)
-            freq = [0 for _ in range(maxn)]
-            for num in nums: freq[num] += 1
-            self._fenw = Fenwick(maxn, freq)
+            freqs = [0 for _ in range(maxn)]
+            for num in nums:
+                self._check(num)
+                freqs[num] = 1
+            self._fenw = Fenwick(maxn, freqs)
+            self._sz = self._fenw.pref(maxn)
         else:
             self._fenw = Fenwick(maxn)
 
