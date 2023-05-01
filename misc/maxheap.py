@@ -1,23 +1,25 @@
-def heappop_max(hp):
-    ans = hp.pop()
-    if hp:
-        ans, hp[0] = hp[0], ans
-        heapq._siftup_max(hp, 0)
+from heapq import _siftup_max, _siftdown_max, _heapify_max
+
+def heappop_max(pq):
+    ans = pq.pop()
+    if pq:
+        ans, pq[0] = pq[0], ans
+        _siftup_max(pq, 0)
     return ans
 
-def heapreplace_max(hp, x):
-    ans, hp[0] = hp[0], x
-    heapq._siftup_max(hp, 0)
+def heapreplace_max(pq, x):
+    ans, pq[0] = pq[0], x
+    _siftup_max(pq, 0)
     return ans
 
-def heappush_max(hp, x):
-    hp.append(x)
-    heapq._siftdown_max(hp, 0, len(hp) - 1)
+def heappush_max(pq, x):
+    pq.append(x)
+    _siftdown_max(pq, 0, len(pq) - 1)
 
-def heappushpop_max(hp, x):
-    if hp and hp[0] > x:
-        x, hp[0] = hp[0], x
-        heapq._siftup_max(hp, 0)
+def heappushpop_max(pq, x):
+    if pq and pq[0] > x:
+        x, pq[0] = pq[0], x
+        _siftup_max(pq, 0)
     return x
 
-heapify_max = heapq._heapify_max
+heapify_max = _heapify_max
