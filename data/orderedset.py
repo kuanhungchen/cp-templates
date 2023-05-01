@@ -3,21 +3,18 @@ from fenwick import Fenwick
 
 class OrderedSet:
     def __init__(self, maxn, nums=None):
-        self._maxn = maxn # nums can be only [0, maxn - 1]
-        self._sz = 0
+        self._maxn = maxn  # nums can be only [0, maxn - 1]
+        self._freq = [0 for _ in range(maxn)]
         if nums:
-            freqs = [0 for _ in range(maxn)]
             for num in nums:
                 self._check(num)
-                freqs[num] = 1
-            self._fenw = Fenwick(maxn, freqs)
-            self._sz = self._fenw.pref(maxn)
-        else:
-            self._fenw = Fenwick(maxn)
+                self._freq[num] = 1
+        self._fenw = Fenwick(maxn, self._freq)
+        self._sz = self._fenw.pref(maxn)
 
     def __contains__(self, val):
         self._check(val)
-        return bool(self._fenw.query(val, val + 1))
+        return bool(self._freq[val])
 
     def __len__(self):
         return self._sz
@@ -39,6 +36,7 @@ class OrderedSet:
         self._check(val)
         if val in self: return False
         self._fenw.add(val, 1)
+        self._freq[val] = 1
         self._sz += 1
         return True
 
@@ -46,6 +44,7 @@ class OrderedSet:
         self._check(val)
         if val not in self: return False
         self._fenw.add(val, -1)
+        self._freq[val] = 0
         self._sz -= 1
         return True
 
@@ -82,5 +81,5 @@ class OrderedSet:
 
     def __iter__(self):
         for val in range(self._maxn):
-            if val in self:
+            for f in range(self._freq[val]):
                 yield val
