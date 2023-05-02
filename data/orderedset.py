@@ -1,9 +1,8 @@
 from fenwick import Fenwick
-from typing import Iterator, List
 
 
 class OrderedSet:
-    def __init__(self, maxn: int, nums: List[int] | None = None):
+    def __init__(self, maxn, nums=None):
         self._maxn = maxn  # nums can be only [0, maxn - 1]
         self._freq = [0 for _ in range(maxn)]
         if nums:
@@ -80,14 +79,14 @@ class OrderedSet:
     def __repr__(self) -> str:
         return "OrderedSet({})".format(list(self))
 
-    def __iter__(self) -> Iterator[int]:
+    def __iter__(self):
         for val in range(self._maxn):
             for _ in range(self._freq[val]):
                 yield val
 
 
 class OrderedMultiSet(OrderedSet):
-    def __init__(self, maxn: int, nums: List[int] | None = None):
+    def __init__(self, maxn, nums=None):
         self._maxn = maxn  # nums can be only [0, maxn - 1]
         self._freq = [0 for _ in range(maxn)]
         if nums:
