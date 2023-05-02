@@ -104,7 +104,7 @@ class OrderedMultiSet(OrderedSet):
     def update(self, val, delta):
         # add or remove occurence of val
         self._check(val)
-        if self.count(val) + delta < 0: return True
+        if self.count(val) + delta < 0: return False
         self._fenw.add(val, delta)
         self._freq[val] += delta
         self._sz += delta
