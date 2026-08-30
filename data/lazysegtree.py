@@ -44,6 +44,7 @@ class LazySegTree:
             self.lzy[idx] = self.DFLT_TAG
 
     def range_update(self, ql, qr, tag):
+        # [ql, qr]
         def __range_update(ql, qr, tag, l, r, idx=1):
             if ql <= l and r <= qr:
                 self.arr[idx] = self.APLY(tag, self.arr[idx], r - l + 1)
@@ -59,6 +60,7 @@ class LazySegTree:
         __range_update(ql, qr, tag, 0, self.n - 1)
 
     def query(self, ql, qr):
+        # [ql, qr]
         def __query(ql, qr, l, r, idx=1):
             if ql <= l and r <= qr:
                 return self.arr[idx]
