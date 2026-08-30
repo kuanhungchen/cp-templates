@@ -1,6 +1,8 @@
 class SegTree:
     def __init__(self, n, nums=None):
+        # Function that combines two nodes
         self.FUNC = lambda a, b: a + b
+        # Default value
         self.DFLT = 0
 
         self.n = n
