@@ -1,4 +1,4 @@
-def lcs(s, t):
+def longest_common_subsequence(s, t):
     m, n = len(s), len(t)
     dp = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
     for i, c1 in enumerate(s):
