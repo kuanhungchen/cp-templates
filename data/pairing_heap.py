@@ -8,14 +8,14 @@ class Node:
         self.par = self.chd = self.bro = None
 
     def __repr__(self):
-        return "Node(key={}, val={})".format(self.key, self.val)
+        return f"Node(key={self.key!r}, val={self.val!r})"
 
-MINIMUM_KEY = (float("-inf"), "")  # update this if key is not numeric
 
 class PairingHeap:
-    def __init__(self):
+    def __init__(self, min_key=float("-inf")):
         self.rt = None
         self.sz = 0
+        self.min_key = min_key
 
     def __bool__(self) -> bool:
         return self.sz != 0
@@ -26,14 +26,12 @@ class PairingHeap:
     @property
     def top(self) -> Node:
         if self.rt is None:
-            raise IndexError("top from empty heap")
+            raise ValueError("top from empty heap")
         return self.rt
 
     def pop(self) -> Node:
-        if not self:
-            raise IndexError("pop from empty heap")
-        if self.rt is None:
-            raise IndexError("pop from empty heap")
+        if not self or self.rt is None:
+            raise ValueError("pop from empty heap")
         rt = self.rt
         self.rt = self._pair(self.rt.chd)
         self.sz -= 1
@@ -48,20 +46,21 @@ class PairingHeap:
         """merge with another pairing heap"""
         self.rt = self._merge(self.rt, other.rt)
         self.sz += other.sz
+        other.rt = None
+        other.sz = 0
 
     def decrease(self, node: Node, key):
         """decrease key of given node"""
         if node != self.rt and node.par is None:
-            raise RuntimeError("given node {} have already been removed " \
-                                "from heap".format(node))
+            raise ValueError(f"given node {node} have already been removed from heap")
         if not key <= node.key:
-            raise RuntimeError("new key {} should be less than or equal to " \
-                                "original key {}.".format(key, node.key))
+            raise ValueError(f"new key {key} should be <= original key {node.key}")
+
         node.key = key
         if node != self.rt:
             if node.par and node.par.chd and node.par.chd == node:
                 node.par.chd = node.bro
-            else:
+            elif node.par:
                 node.par.bro = node.bro
             if node.bro:
                 node.bro.par = node.par
@@ -71,9 +70,8 @@ class PairingHeap:
     def remove(self, node: Node):
         """remove the given node from heap"""
         if node != self.rt and node.par is None:
-            raise RuntimeError("given node {} have already been removed " \
-                                "from heap".format(node))
-        self.decrease(node, MINIMUM_KEY)
+            raise ValueError(f"given node {node} have already been removed from heap")
+        self.decrease(node, self.min_key)
         self.pop()
 
     def _pair(self, node):
