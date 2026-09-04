@@ -5,7 +5,7 @@ class ZKWLazySegTree:
         # Function that applies tag to val
         self.APLY = lambda tag, val, length: tag[0] * val + tag[1] * length
         # Function that composites new and old tags
-        self.COMP = lambda new_t, old_t: (new_t[0] * old_t[0], 
+        self.COMP = lambda new_t, old_t: (new_t[0] * old_t[0],
                                             new_t[0] * old_t[1] + new_t[1])
         # Default value
         self.DFLT = 0
@@ -70,10 +70,10 @@ class ZKWLazySegTree:
             return
         l0 = ql + self.N
         r0 = qr + 1 + self.N
-        
+
         self.__push(l0)
         self.__push(r0 - 1)
-        
+
         l, r = l0, r0
         while l < r:
             if l & 1:
@@ -84,29 +84,25 @@ class ZKWLazySegTree:
                 self.__apply(r, tag)
             l >>= 1
             r >>= 1
-            
+
         self.__build(l0)
         self.__build(r0 - 1)
 
     def query(self, ql, qr):
         # [ql, qr]
-        if ql > qr:
-            return self.DFLT
-        l0 = ql + self.N
-        r0 = qr + 1 + self.N
-        
-        self.__push(l0)
-        self.__push(r0 - 1)
-        
-        res = self.DFLT
+        if ql > qr: return self.DFLT
+        l0 = ql + self.N; r0 = qr + 1 + self.N
+
+        self.__push(l0); self.__push(r0 - 1)
+
+        res_l, res_r = self.DFLT, self.DFLT
         l, r = l0, r0
         while l < r:
             if l & 1:
-                res = self.FUNC(res, self.t[l])
+                res_l = self.FUNC(res_l, self.t[l])
                 l += 1
             if r & 1:
                 r -= 1
-                res = self.FUNC(self.t[r], res)
-            l >>= 1
-            r >>= 1
-        return res
+                res_r = self.FUNC(self.t[r], res_r)
+            l >>= 1; r >>= 1
+        return self.FUNC(res_l, res_r)
