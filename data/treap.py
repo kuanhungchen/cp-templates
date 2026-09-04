@@ -10,9 +10,11 @@ class TreapMultiSet:
         self._keys = [0]
         self._pris = [0.0]
 
-        if nums:
-            self._rt = self._build(nums)
-            self._sz = len(nums)
+        if nums is not None:
+            nums_list = list(nums)
+            if nums_list:
+                self._rt = self._build(nums)
+                self._sz = len(nums)
 
     def add(self, key):
         # add one occurence for key
@@ -108,21 +110,21 @@ class TreapMultiSet:
             while True:
                 l = lchd[idx]
                 r = rchd[idx]
-                if l and pris[l] > pris[idx]:
-                    if r and pris[r] > pris[idx]:
-                        pris[idx], pris[r] = pris[r], pris[idx]
-                        idx = r
-                    else:
-                        pris[idx], pris[l] = pris[l], pris[idx]
-                        idx = l
-                elif r and pris[r] > pris[idx]:
-                    pris[idx], pris[r] = pris[r], pris[idx]
-                    idx = r
+                largest = idx
+
+                if l and pris[l] > pris[largest]:
+                    largest = l
+                if r and pris[r] > pris[largest]:
+                    largest = r
+
+                if largest != idx:
+                    pris[idx], pris[largest] = pris[largest], pris[idx]
+                    idx = largest
                 else:
                     break
             return rt
 
-        nums.sort()
+        nums = sorted(nums)
         lchd = self._lchd
         rchd = self._rchd
         pris = self._pris
@@ -301,11 +303,8 @@ class TreapMultiSet:
 
 class TreapHashSet(TreapMultiSet):
     def __init__(self, nums=None):
-        if nums:
-            self._internal_keys = set(nums)
-            super(TreapHashSet, self).__init__(list(self._internal_keys))
-        else:
-            self._internal_keys = set()
+        self._internal_keys = set(nums) if nums else set()
+        super().__init__(list(self._internal_keys))
 
     def add(self, key):
         if key not in self._internal_keys:
@@ -329,10 +328,8 @@ class TreapHashSet(TreapMultiSet):
 
 class TreapHashMap(TreapMultiSet):
     def __init__(self, dict_=None):
-        self._internal_dict = dict()
-        if dict_:
-            self._internal_dict = dict_
-            super(TreapHashMap, self).__init__(list(dict_.keys()))
+        self._internal_dict = dict(dict_) if dict_ else dict()
+        super().__init__(list(self._internal_dict.keys()))
 
     def __setitem__(self, key, value):
         if key not in self._internal_dict:
@@ -343,6 +340,7 @@ class TreapHashMap(TreapMultiSet):
         return self._internal_dict[key]
 
     def add(self, key):
+        del key
         raise TypeError("add on TreapHashMap")
 
     def get(self, key, default=None):
@@ -361,4 +359,4 @@ class TreapHashMap(TreapMultiSet):
 
     def __repr__(self):
         return "TreapHashMap({{{}}})".format(
-                ", ".join("{}: {}".format(key, self.get(key)) for key in self))
+            ", ".join("{!r}: {!r}".format(key, self.get(key)) for key in self))
