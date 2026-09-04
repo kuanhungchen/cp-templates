@@ -63,8 +63,8 @@ class OrderedSet:
     def pre(self, val: int) -> int:
         # reutrn first element <= val, or -1 if not exists
         self._check(val)
-        ans = self._fenw.bisect_left(self._fenw.pref(val + 1))
-        return ans
+        if (cnt := self._fenw.pref(val + 1)) == 0: return -1
+        return self._fenw.bisect_left(cnt)
 
     def nxt(self, val: int) -> int:
         # return first element >= val, or -1 if not exists
@@ -77,7 +77,7 @@ class OrderedSet:
             raise ValueError("{} not in [0, {}]".format(val, self._maxn - 1))
 
     def __repr__(self) -> str:
-        return "OrderedSet({})".format(list(self))
+        return "{}({})".format(self.__class__.__name__, list(self))
 
     def __iter__(self):
         for val in range(self._maxn):
@@ -99,7 +99,7 @@ class OrderedMultiSet(OrderedSet):
     def count(self, val: int) -> int:
         # return occurence of val
         self._check(val)
-        return self._fenw.query(val, val + 1)
+        return self._freq[val]
 
     def update(self, val: int, delta: int) -> bool:
         # add or remove occurence of val
