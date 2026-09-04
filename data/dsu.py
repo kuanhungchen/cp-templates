@@ -49,7 +49,7 @@ class DSU:
 
 class DSUWithData(DSU):
     def __init__(self, n, nums):
-        super(DSUWithData, self).__init__(n)
+        super().__init__(n)
         self._data = nums.copy()
 
     @property
