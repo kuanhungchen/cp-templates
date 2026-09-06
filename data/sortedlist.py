@@ -1,5 +1,5 @@
-from math import ceil, sqrt
 from bisect import bisect_left, bisect_right
+from math import ceil, sqrt
 
 
 class SortedList:
@@ -18,9 +18,15 @@ class SortedList:
             return
         num_buckets = ceil(sqrt(n / self.BUCKET_RATIO))
         self._buckets = [
-            sorted_elements[n * i // num_buckets : n * (i + 1) // num_buckets]
+            sorted_elements[
+                n * i // num_buckets : n * (i + 1) // num_buckets
+            ]
             for i in range(num_buckets)
         ]
+
+    def clear(self) -> None:
+        self._size = 0
+        self._buckets = []
 
     def __iter__(self):
         for bucket in self._buckets:
@@ -44,10 +50,13 @@ class SortedList:
     __repr__ = __str__
 
     def _find(self, x) -> tuple[list, int, int]:
+        if not self._buckets:
+            raise IndexError("List is empty")
         for i, bucket in enumerate(self._buckets):
             if x <= bucket[-1]:
                 return (bucket, i, bisect_left(bucket, x))
-        return (self._buckets[-1], len(self._buckets) - 1, len(self._buckets[-1]))
+        last_bucket = self._buckets[-1]
+        return (last_bucket, len(self._buckets) - 1, len(last_bucket))
 
     def __contains__(self, x) -> bool:
         if self._size == 0:
@@ -65,7 +74,7 @@ class SortedList:
         self._size += 1
         if len(bucket) > len(self._buckets) * self.SPLIT_RATIO:
             mid = len(bucket) >> 1
-            self._buckets[bi: bi + 1] = [bucket[:mid], bucket[mid:]]
+            self._buckets[bi : bi + 1] = [bucket[:mid], bucket[mid:]]
 
     def discard(self, x) -> bool:
         if self._size == 0:
@@ -76,6 +85,10 @@ class SortedList:
         self._pop(bucket, bi, i)
         return True
 
+    def remove(self, x) -> None:
+        if not self.discard(x):
+            raise ValueError(f"{x!r} is not in list")
+
     def _pop(self, bucket, bi, i):
         res = bucket.pop(i)
         self._size -= 1
@@ -83,28 +96,35 @@ class SortedList:
             del self._buckets[bi]
         return res
 
+    def count(self, x) -> int:
+        return self.bisect_right(x) - self.bisect_left(x)
+
     def lt(self, x):
         for bucket in reversed(self._buckets):
-            if bucket[0]  < x:
-                return bucket[bisect_left(bucket, x) - 1]
+            if bucket[0] < x:
+                idx = bisect_left(bucket, x) - 1
+                return bucket[idx]
         return None
 
     def le(self, x):
-       for bucket in reversed(self._buckets):
-           if bucket[0] <= x:
-               return bucket[bisect_right(bucket, x) - 1]
-       return None
+        for bucket in reversed(self._buckets):
+            if bucket[0] <= x:
+                idx = bisect_right(bucket, x) - 1
+                return bucket[idx]
+        return None
 
     def gt(self, x):
         for bucket in self._buckets:
             if bucket[-1] > x:
-                return bucket[bisect_right(bucket, x)]
+                idx = bisect_right(bucket, x)
+                return bucket[idx]
         return None
 
     def ge(self, x):
         for bucket in self._buckets:
             if bucket[-1] >= x:
-                return bucket[bisect_left(bucket, x)]
+                idx = bisect_left(bucket, x)
+                return bucket[idx]
         return None
 
     def __getitem__(self, i_: int):
@@ -123,7 +143,7 @@ class SortedList:
         if i < 0:
             i += self._size
         if i < 0 or i >= self._size:
-            raise IndexError(f"Index {i_} out of range")
+            raise IndexError("pop index out of range")
         for bi, bucket in enumerate(self._buckets):
             if i < len(bucket):
                 return self._pop(bucket, bi, i)
@@ -148,7 +168,7 @@ class SortedList:
         return cnt
 
     def irange(self, left, right) -> range:
-        # Returns the index range of elemetns in [left, right].
+        # Returns the index range of elements in [left, right].
         return range(self.bisect_left(left), self.bisect_right(right))
 
 
@@ -156,6 +176,9 @@ class SortedSet:
     def __init__(self, nums=None):
         unique = sorted(set(nums)) if nums is not None else []
         self._list = SortedList(unique)
+
+    def clear(self) -> None:
+        self._list.clear()
 
     def add(self, x) -> bool:
         if x in self._list:
@@ -166,11 +189,17 @@ class SortedSet:
     def discard(self, x) -> bool:
         return self._list.discard(x)
 
+    def remove(self, x) -> None:
+        if not self._list.discard(x):
+            raise KeyError(x)
+
     def count(self, x) -> int:
         return 1 if x in self._list else 0
 
     def bisect_left(self, x) -> int:
         return self._list.bisect_left(x)
+
+    index = bisect_left
 
     def bisect_right(self, x) -> int:
         return self._list.bisect_right(x)
@@ -220,12 +249,20 @@ class SortedSet:
 
 
 class SortedDict:
-    def __init__(self, pairs=None):
+    def __init__(self, pairs=None, **kwargs):
         self._map = {}
-        self._keys = SortedList()
-        if pairs:
-            for k, v in pairs:
-                self[k] = v
+        if pairs is not None:
+            if isinstance(pairs, dict):
+                self._map.update(pairs)
+            else:
+                self._map.update(dict(pairs))
+        if kwargs:
+            self._map.update(kwargs)
+        self._keys = SortedList(self._map.keys())
+
+    def clear(self) -> None:
+        self._map.clear()
+        self._keys.clear()
 
     def __setitem__(self, key, value):
         if key not in self._map:
@@ -235,10 +272,18 @@ class SortedDict:
     def __getitem__(self, key):
         return self._map[key]
 
+    def get(self, key, default=None):
+        return self._map.get(key, default)
+
     def __delitem__(self, key):
+        del self._map[key]
+        self._keys.discard(key)
+
+    def remove(self, key) -> None:
         if key in self._map:
-            del self._map[key]
-            self._keys.discard(key)
+            del self[key]
+        else:
+            raise KeyError(key)
 
     def pop(self, key, default=...):
         if key in self._map:
@@ -249,26 +294,45 @@ class SortedDict:
             return default
         raise KeyError(key)
 
-    def peekitem(self, index=-1):
+    def popitem(self, index: int = -1) -> tuple:
+        if not self._map:
+            raise KeyError("popitem(): dictionary is empty")
+        key = self._keys.pop(index)
+        val = self._map.pop(key)
+        return key, val
+
+    def peekitem(self, index=-1) -> tuple:
         key = self._keys[index]
         return key, self._map[key]
 
-    def keys(self):
+    def keys(self) -> SortedList:
         return self._keys
 
     def values(self):
-        for k in self._keys:
-            yield self._map[k]
+        return [self._map[k] for k in self._keys]
 
     def items(self):
-        for k in self._keys:
-            yield k, self._map[k]
+        return [(k, self._map[k]) for k in self._keys]
 
     def bisect_left(self, key) -> int:
         return self._keys.bisect_left(key)
 
+    index = bisect_left
+
     def bisect_right(self, key) -> int:
         return self._keys.bisect_right(key)
+
+    def lt(self, key):
+        return self._keys.lt(key)
+
+    def le(self, key):
+        return self._keys.le(key)
+
+    def gt(self, key):
+        return self._keys.gt(key)
+
+    def ge(self, key):
+        return self._keys.ge(key)
 
     def __contains__(self, key):
         return key in self._map
