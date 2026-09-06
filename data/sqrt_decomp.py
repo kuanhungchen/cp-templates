@@ -1,8 +1,9 @@
 class SQRTDecomp:
-    def __init__(self, nums):
+    def __init__(self, nums=None):
+        if nums is None: nums = []
         self.FUNC = lambda a, b: a + b
         self.DFLT = 0
-        self.SZ = int(pow(len(nums), 0.5))  # block size
+        self.SZ = max(1, int(pow(len(nums), 0.5)))  # block size
 
         self.nums = nums[:]
         self.bids = [0 for _ in range(len(nums))]  # block id
@@ -65,18 +66,20 @@ class SQRTDecomp:
             for idx in range(ql, (lid + 1) * self.SZ):
                 ans = self.FUNC(ans, self.nums[idx])
             for bid in range(lid + 1, rid):
-                ans = self.FUNC(ans, self.FUNC(self.arr[bid] if not self.lzy2[bid] \
-                                else self.lzy2[bid] * self.SZ, self.lzy[bid] * self.SZ))
+                ans = self.FUNC(ans,
+                    self.FUNC(self.arr[bid] if self.lzy2[bid] is None else
+                              self.lzy2[bid] * self.SZ, self.lzy[bid] * self.SZ))  # pyright: ignore
             for idx in range(rid * self.SZ, qr + 1):
                 ans = self.FUNC(ans, self.nums[idx])
         return ans
 
     def __update(self, bid):
-        if self.lzy2[bid]:
-            for idx in range(bid * self.SZ, (bid + 1) * self.SZ):
+        right_bid = min(len(self.nums), (bid + 1) * self.SZ)
+        if self.lzy2[bid] is not None:
+            for idx in range(bid * self.SZ, right_bid):
                 self.ptassign(idx, self.lzy2[bid])
         if self.lzy[bid]:
-            for idx in range(bid * self.SZ, (bid + 1) * self.SZ):
+            for idx in range(bid * self.SZ, right_bid):
                 self.ptadd(idx, self.lzy[bid])
         self.lzy[bid] = 0
         self.lzy2[bid] = None
